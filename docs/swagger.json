@@ -1,0 +1,87 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API for the Grupos Query service.",
+        "title": "Grupos Query API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/v1/grupos": {
+            "get": {
+                "description": "Get all groups",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grupos"
+                ],
+                "summary": "Get all groups",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Grupo"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/grupos/{id}": {
+            "get": {
+                "description": "Get a group by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "grupos"
+                ],
+                "summary": "Get a group by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Grupo"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.Grupo": {
+            "type": "object",
+            "properties": {
+                "cantidadAcampantes": {
+                    "type": "integer"
+                },
+                "dirigentes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nombre": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
