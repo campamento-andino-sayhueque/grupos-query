@@ -3,9 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/cas/grupos-query/internal/domain"
 	"github.com/cas/grupos-query/internal/storage"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
 type Handlers struct {
@@ -23,12 +22,13 @@ func NewHandlers(repo storage.GroupRepository) *Handlers {
 // @Produce json
 // @Success 200 {array} domain.Grupo
 // @Router /v1/grupos [get]
-func (h *Handlers) GetGrupos(c echo.Context) error {
-	grupos, err := h.repo.GetAll(c.Request().Context())
+func (h *Handlers) GetGrupos(c *gin.Context) {
+	grupos, err := h.repo.GetAll(c.Request.Context())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	return c.JSON(http.StatusOK, grupos)
+	c.JSON(http.StatusOK, grupos)
 }
 
 // GetGrupoByID returns a group by its ID.
@@ -39,11 +39,12 @@ func (h *Handlers) GetGrupos(c echo.Context) error {
 // @Param id path string true "Group ID"
 // @Success 200 {object} domain.Grupo
 // @Router /v1/grupos/{id} [get]
-func (h *Handlers) GetGrupoByID(c echo.Context) error {
+func (h *Handlers) GetGrupoByID(c *gin.Context) {
 	id := c.Param("id")
-	grupo, err := h.repo.GetByID(c.Request().Context(), id)
+	grupo, err := h.repo.GetByID(c.Request.Context(), id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	return c.JSON(http.StatusOK, grupo)
+	c.JSON(http.StatusOK, grupo)
 }

@@ -10,7 +10,8 @@ import (
 	"github.com/cas/grupos-query/internal/api"
 	ps "github.com/cas/grupos-query/internal/pubsub"
 	"github.com/cas/grupos-query/internal/storage/firestore"
-	echoSwagger "github.com/swaggo/echo-swagger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title Grupos Query API
@@ -46,13 +47,13 @@ func main() {
 		}
 	}()
 
-	// Echo
-	e := api.NewRouter(repo)
+	// Gin
+	r := api.NewRouter(repo)
 	docs.SwaggerInfo.BasePath = "/v1"
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	log.Println("Starting server on :8080")
-	if err := e.Start(":8080"); err != nil {
+	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

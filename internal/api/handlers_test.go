@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/cas/grupos-query/internal/domain"
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -40,39 +40,34 @@ func (m *MockRepository) Update(ctx context.Context, group *domain.Grupo) error 
 }
 
 func TestGetGrupos(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/", nil)
 
 	mockRepo := new(MockRepository)
 	grupos := []domain.Grupo{{ID: "1", Nombre: "Grupo 1"}}
 	mockRepo.On("GetAll", mock.Anything).Return(grupos, nil)
 
 	h := NewHandlers(mockRepo)
+	h.GetGrupos(c)
 
-	if assert.NoError(t, h.GetGrupos(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.JSONEq(t, `[{"ID":"1","Nombre":"Grupo 1","Dirigentes":null,"CantidadAcampantes":0}]`, rec.Body.String())
-	}
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `[{"ID":"1","Nombre":"Grupo 1","Dirigentes":null,"CantidadAcampantes":0}]`, w.Body.String())
 }
 
 func TestGetGrupoByID(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-	c.SetParamNames("id")
-	c.SetParamValues("1")
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/", nil)
+	c.Params = []gin.Param{{Key: "id", Value: "1"}}
 
 	mockRepo := new(MockRepository)
 	grupo := &domain.Grupo{ID: "1", Nombre: "Grupo 1"}
 	mockRepo.On("GetByID", mock.Anything, "1").Return(grupo, nil)
 
 	h := NewHandlers(mockRepo)
+	h.GetGrupoByID(c)
 
-	if assert.NoError(t, h.GetGrupoByID(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.JSONEq(t, `{"ID":"1","Nombre":"Grupo 1","Dirigentes":null,"CantidadAcampantes":0}`, rec.Body.String())
-	}
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `{"ID":"1","Nombre":"Grupo 1","Dirigentes":null,"CantidadAcampantes":0}`, w.Body.String())
 }
